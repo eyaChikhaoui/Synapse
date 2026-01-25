@@ -1,3 +1,17 @@
+<<<<<<< HEAD
+# TO-DO: Person 1 (ML Lead) will write the code here
+import numpy as np
+
+def encode_dna(sequence):
+    """
+    P1: Write your DNABERT/Transformer logic here.
+    Input: DNA sequence (string)
+    Output: Vector embedding (list of floats)
+    """
+    # حالياً، هذا كود مؤقت لكي يعمل السيرفر
+    # P1: امسح هذا السطر واكتب كودك الحقيقي غداً
+    return np.random.rand(768).tolist()
+=======
 import torch
 import numpy as np
 import json
@@ -60,3 +74,4 @@ if __name__ == "__main__":
     print("\n✅ [Deliverable: Vector for P2]")
     vector = encoder.encode(test_dna)
     print(f"Vector Length: {len(vector)} (Matches Qdrant Schema)")
+>>>>>>> 3b31a8e (feat: implement shared latent space (768-dim) and real encoders)
