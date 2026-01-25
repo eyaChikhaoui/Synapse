@@ -1,29 +1,31 @@
+# --- FILE: src/main.py ---
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sys
 import os
 import numpy as np
 
-# إضافة المسارات
+# Add src to path so we can import modules
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# استيراد الأكواد الحقيقية من الفريق
 try:
+    # Import the Worker Classes
     from encoders.dna_encoder import DNAEncoder
     from encoders.protein_encoder import ProteinEncoder
     from database.db_manager import VectorDB
-    # from database.mock_db import MockVectorDB # فكي التعليق إذا لم يعمل Docker
 except ImportError as e:
     print(f"❌ Error importing modules: {e}")
 
 app = Flask(__name__)
 CORS(app)
 
-# بناء الـ Orchestrator لربط الفريق
 class SynapseOrchestrator:
     def __init__(self):
         print("🚀 [Synapse] Initializing Multimodal Orchestrator...")
+        # Initialize the AI Model
         self.dna_engine = DNAEncoder()
+        
+        # Initialize the Database
         try:
             self.db = VectorDB()
             print("✅ [Synapse] Database Connection Established.")
@@ -32,17 +34,18 @@ class SynapseOrchestrator:
             self.db = None
 
     def find_protein_match(self, dna_sequence, top_k=3):
-        # تحويل الـ DNA لمتجه (كود P1)
+        # Step 1: Convert DNA to Vector using the Encoder
         vector = self.dna_engine.get_vector(dna_sequence)
-        # البحث في القاعدة (كود P2)
+        
+        # Step 2: Search in Database
         if self.db:
             return self.db.search_similar(vector.tolist(), top_k=top_k)
         return [{"error": "Database not connected"}]
 
-# إنشاء نسخة من المحرك
+# Initialize the System
 synapse = SynapseOrchestrator()
 
-# --- الروابط (Routes) للشخص الرابع P4 ---
+# --- API ROUTES ---
 
 @app.route('/api/search', methods=['POST'])
 def search():
@@ -53,10 +56,11 @@ def search():
         return jsonify({"error": "No DNA sequence"}), 400
         
     try:
-        # تشغيل العملية الكاملة
+        # Run the search
         results = synapse.find_protein_match(dna)
         return jsonify({"status": "success", "results": results})
     except Exception as e:
+        print(f"❌ Error during search: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

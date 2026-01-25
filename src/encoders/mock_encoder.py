@@ -60,4 +60,4 @@ if __name__ == "__main__":
     print("\n✅ [Deliverable: Vector for P2]")
     vector = encoder.encode(test_dna)
     print(f"Vector Length: {len(vector)} (Matches Qdrant Schema)")
-
+    

@@ -6,3 +6,5 @@ qdrant-client
 torch
 transformers
 python-dotenv
+python-multipart 
+httpx

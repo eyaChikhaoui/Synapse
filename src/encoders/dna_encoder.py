@@ -11,7 +11,7 @@ sys.path.append(parent_dir)
 
 from utils.data_processor import DataProcessor
 
-class RealEncoder(nn.Module):
+class DNAEncoder(nn.Module):
     """
     Person 1 (ML Lead) - Production Real Encoder.
     Replaces mock numbers with real biological embeddings.
@@ -38,8 +38,7 @@ class RealEncoder(nn.Module):
         # NTv2 outputs 512 dim, so we project it to 768
         self.projection = nn.Linear(512, 768) 
 
-    def encode(self, sequence: str):
-        # Step 1: Clean data
+    def get_vector(self, sequence: str):
         clean_seq = self.processor.clean_dna(sequence)
         
         # Step 2: Biological Inference

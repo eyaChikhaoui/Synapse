@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 
 class MockVectorDB:
     """
-    نسخة مؤقتة لمحاكاة قاعدة بيانات Qdrant
+        Qdrant
     """
     def __init__(self):
         print("⚠️  MOCK DB INITIALIZED: Returning static data only.")
