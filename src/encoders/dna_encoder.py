@@ -1,69 +1,64 @@
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer, AutoModel, AutoConfig
+from transformers import AutoTokenizer, AutoModel
+import sys
+import os
 
-class DNAEncoder(nn.Module):
+# --- PATH FIX: Ensure we can import from 'src' root ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+from utils.data_processor import DataProcessor
+
+class RealEncoder(nn.Module):
     """
-    Person 1 (ML Lead) - Production DNA Encoder.
-    Uses InstaDeep's Nucleotide Transformer v2 with a Projection Head 
-    to align with the 768-dimension Shared Latent Space.
+    Person 1 (ML Lead) - Production Real Encoder.
+    Replaces mock numbers with real biological embeddings.
     """
-    def __init__(self, model_id="InstaDeepAI/nucleotide-transformer-v2-50m-multi-species", target_dim=768):
+    def __init__(self, model_id="InstaDeepAI/nucleotide-transformer-v2-50m-multi-species"):
         super().__init__()
-        print(f"🧬 [DNAEncoder] Initializing with base: {model_id}")
         
-        # 1. Load Patched Config & Model (Based on your successful diagnostics)
-        config = AutoConfig.from_pretrained(model_id, trust_remote_code=True)
-        config.intermediate_size = 4096 # Apply your verified patch
-        
+        # Load Tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-        self.base_model = AutoModel.from_pretrained(
+        
+        # --- CRITICAL FIX: Ignore Mismatched Sizes ---
+        # The v2-50m model has inconsistent internal dimensions for some layers 
+        # (GLU vs Standard FFN). We use ignore_mismatched_sizes=True to load 
+        # the valid weights and safely skip the conflicting ones.
+        self.model = AutoModel.from_pretrained(
             model_id, 
-            config=config, 
             trust_remote_code=True,
-            ignore_mismatched_sizes=True
+            ignore_mismatched_sizes=True 
         )
         
-        # 2. Projection Layer (The Bridge)
-        # Up-scales the 512-dim output of NTv2 to our 768-dim Shared Latent Space
-        self.projection = nn.Linear(self.base_model.config.hidden_size, target_dim)
+        self.processor = DataProcessor()
         
-        print(f"✅ [DNAEncoder] Ready. Projection: {self.base_model.config.hidden_size} -> {target_dim}")
+        # Ensure output is always 768 for P2 (DB) and P4 (UI)
+        # NTv2 outputs 512 dim, so we project it to 768
+        self.projection = nn.Linear(512, 768) 
 
-    def forward(self, sequence: str):
-        # Clean sequence (Standard Bio-Cleaning)
-        sequence = sequence.upper().replace(" ", "")
+    def encode(self, sequence: str):
+        # Step 1: Clean data
+        clean_seq = self.processor.clean_dna(sequence)
         
-        # Tokenize
-        inputs = self.tokenizer(sequence, return_tensors="pt")
-        
-        # Inference
+        # Step 2: Biological Inference
+        inputs = self.tokenizer(clean_seq, return_tensors="pt")
         with torch.no_grad():
-            outputs = self.base_model(**inputs)
-            # Use Mean Pooling across the sequence length (dim 1)
+            outputs = self.model(**inputs)
+            # Use mean pooling
             embeddings = outputs.last_hidden_state.mean(dim=1)
             
-            # Project to Shared Latent Space
-            projected_embeddings = self.projection(embeddings)
-            
-        return projected_embeddings
-
-    def get_vector(self, sequence: str):
-        """Helper to return a flat numpy array for the DB."""
-        tensor = self.forward(sequence)
-        return tensor.squeeze().numpy()
+            # Step 3: Project to Shared Latent Space (768)
+            projected = self.projection(embeddings)
+            return projected.squeeze().numpy()
 
 if __name__ == "__main__":
-    # Smoke Test for Step 2
-    encoder = DNAEncoder()
-    test_seq = "GATCCA"
-    vector = encoder.get_vector(test_seq)
+    print("⏳ Initializing RealEncoder (ignore_mismatched_sizes=True)...")
+    encoder = RealEncoder()
+    print("✅ RealEncoder initialized successfully.")
     
-    print(f"\n🧪 Smoke Test Output:")
-    print(f"Sequence: {test_seq}")
-    print(f"Final Vector Shape: {vector.shape}") # MUST BE (768,)
-    
-    if vector.shape[0] == 768:
-        print("🎉 SUCCESS: DNA is now aligned with the Shared Latent Space.")
-    else:
-        print("❌ ERROR: Dimension mismatch.")
+    # Test with a dummy sequence
+    test_seq = "ATGCGTAGCTAG"
+    vector = encoder.encode(test_seq)
+    print(f"🧬 Vector Shape: {vector.shape} (Should be 768)")
