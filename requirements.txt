@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 flask
 flask-cors
 numpy
 qdrant-client
+=======
+flask
+flask-cors
+numpy
+qdrant-client
+>>>>>>> 72f6233b6c18d5c0c844a9fd9ea1160810c80b74
 pandas
