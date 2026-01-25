@@ -1,49 +1,64 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import sys
+import os
 import numpy as np
-from encoders.dna_encoder import DNAEncoder
-from encoders.protein_encoder import ProteinEncoder
 
+# إضافة المسارات
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# استيراد الأكواد الحقيقية من الفريق
+try:
+    from encoders.dna_encoder import DNAEncoder
+    from encoders.protein_encoder import ProteinEncoder
+    from database.db_manager import VectorDB
+    # from database.mock_db import MockVectorDB # فكي التعليق إذا لم يعمل Docker
+except ImportError as e:
+    print(f"❌ Error importing modules: {e}")
+
+app = Flask(__name__)
+CORS(app)
+
+# بناء الـ Orchestrator لربط الفريق
 class SynapseOrchestrator:
-    """
-    The Central AI Brain of Synapse.
-    Managed by Person 1 (ML Lead).
-    """
     def __init__(self):
         print("🚀 [Synapse] Initializing Multimodal Orchestrator...")
         self.dna_engine = DNAEncoder()
-        self.protein_engine = ProteinEncoder()
-        print("✅ [Synapse] All systems online. Shared Latent Space (768) active.")
+        try:
+            self.db = VectorDB()
+            print("✅ [Synapse] Database Connection Established.")
+        except Exception as e:
+            print(f"⚠️ [Synapse] DB Connection Failed: {e}")
+            self.db = None
 
-    def process_sequence(self, sequence: str, mode: str = "dna"):
-        """
-        Routes a sequence to the correct encoder and returns the 768-dim vector.
-        """
-        mode = mode.lower()
-        if mode == "dna":
-            return self.dna_engine.get_vector(sequence)
-        elif mode == "protein" or mode == "prot":
-            return self.protein_engine.get_vector(sequence)
-        else:
-            raise ValueError("Invalid mode. Choose 'dna' or 'protein'.")
+    def find_protein_match(self, dna_sequence, top_k=3):
+        # تحويل الـ DNA لمتجه (كود P1)
+        vector = self.dna_engine.get_vector(dna_sequence)
+        # البحث في القاعدة (كود P2)
+        if self.db:
+            return self.db.search_similar(vector.tolist(), top_k=top_k)
+        return [{"error": "Database not connected"}]
 
-if __name__ == "__main__":
-    # --- DAY 1 FINAL DEMO ---
-    synapse = SynapseOrchestrator()
+# إنشاء نسخة من المحرك
+synapse = SynapseOrchestrator()
+
+# --- الروابط (Routes) للشخص الرابع P4 ---
+
+@app.route('/api/search', methods=['POST'])
+def search():
+    data = request.get_json()
+    dna = data.get('dna_sequence', '')
     
-    # 1. Process DNA
-    dna_seq = "ATGCGTACGTTAG"
-    dna_vector = synapse.process_sequence(dna_seq, mode="dna")
-    
-    # 2. Process Protein
-    prot_seq = "GIVEQCCTSICSLYQLENYCN"
-    prot_vector = synapse.process_sequence(prot_seq, mode="protein")
-    
-    print("\n--- DAY 1 FINAL REPORT ---")
-    print(f"🔹 DNA Input: {dna_seq} -> Vector({len(dna_vector)})")
-    print(f"🔹 Protein Input: {prot_seq} -> Vector({len(prot_vector)})")
-    
-    # Cross-check
-    if len(dna_vector) == len(prot_vector) == 768:
-        print("\n🏆 STATUS: MISSION ACCOMPLISHED.")
-        print("The Shared Latent Space is unified at 768 dimensions.")
-    else:
-        print("\n⚠️ STATUS: CRITICAL FAILURE. Dimension desync detected.")
+    if not dna:
+        return jsonify({"error": "No DNA sequence"}), 400
+        
+    try:
+        # تشغيل العملية الكاملة
+        results = synapse.find_protein_match(dna)
+        return jsonify({"status": "success", "results": results})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    print("🌍 Synapse Server running on http://localhost:5000")
+    app.run(debug=True, port=5000)
