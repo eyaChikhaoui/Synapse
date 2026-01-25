@@ -218,14 +218,11 @@ Synapse/
 * 
 **Eya Chikhaoui** 
 
-
-* 
-**Aziz Mazghouni** 
-
-
 * 
 **Balkis Mahjoubi** 
 
+* 
+**Aziz Mazghouni** 
 
 * 
 **Mouhamed Gharsallah** 
@@ -240,3 +237,4 @@ Synapse/
 ```text
 Synapse/
 └── README.md  <-- [CREATED]
+
