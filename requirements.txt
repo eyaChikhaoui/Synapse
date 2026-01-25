@@ -1,9 +1,8 @@
 flask
 flask-cors
 numpy
-qdrant-client
-flask
-flask-cors
-numpy
-qdrant-client
 pandas
+qdrant-client
+torch
+transformers
+python-dotenv
