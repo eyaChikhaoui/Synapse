@@ -176,9 +176,10 @@ Synapse/
 
 **Team wasa3 methniya**
 * **Eya Chikhaoui**
-* **Aziz Mazghouni**
 * **Balkis Mahjoubi**
+* **Aziz Mazghouni**
 * **Mouhamed Gharsallah**
 
 ---
 *Built with 💻 and 🧬 in Tunisia.*
+
