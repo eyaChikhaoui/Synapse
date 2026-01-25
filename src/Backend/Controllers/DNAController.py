@@ -12,7 +12,6 @@ class DNAController:
 
     @staticmethod
     async def analyze_sequence(request: Request, dna_input: str):
-        # Business Logic
         seq = dna_input.strip().upper()
 
         # Calculation
