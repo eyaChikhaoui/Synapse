@@ -1,6 +1,3 @@
-# Synapse
-Synapse: A multimodal AI bridge connecting DNA and Protein data. Using Qdrant and a Shared Latent Space, we transform heavy computational protein analysis into a fast geometric search problem. By integrating NTv3 and ESM-2, Synapse acts as an adapter layer that solves the "interpretation gap" and identifies genetic variants (VUS) in seconds.
-=======
 # 🧬 SYNAPSE
 ### Multimodal Biological Intelligence: Bridging the Gap Between DNA and Proteins
 
@@ -61,6 +58,7 @@ graph LR
 
 ### 🛠️ Tech Stack
 * **Core Engine:** Python 3.9+
+* **Backend Framework:** Flask / Python
 * **Genomics Model:** `InstaDeepAI/nucleotide-transformer-v2-50m-multi-species`
 * **Proteomics Model:** `facebook/esm2_t6_8M_UR50D`
 * **Vector Database:** Qdrant (Dockerized)
@@ -77,8 +75,8 @@ graph LR
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/eyaChikhaoui/Synapse.git](https://github.com/eyaChikhaoui/Synapse.git)
-cd Synapse
+git clone https://github.com/eyaChikhaoui/Synapse.git
+cd Synapse-main
 ```
 
 ### 2. Set Up Environment
@@ -109,7 +107,7 @@ Synapse is designed for rapid iteration. We support two execution modes to unblo
 ### Mode A: The "Mock" Protocol (Fast Dev)
 *Use this when developing the UI or Database logic without loading heavy AI models.*
 1.  Open `src/main.py`.
-2.  Uncomment `MockVectorDB` and comment out `VectorDB`.
+2.  Uncomment `MockVectorDB` / `MockEncoder` and comment out the real versions.
 3.  Run the pipeline:
 ```bash
 python src/main.py
@@ -123,7 +121,7 @@ python src/main.py
 ```bash
 python src/database/upload_vectors.py
 ```
-3.  Run the Orchestrator:
+3.  Run the Application:
 ```bash
 python src/main.py
 ```
@@ -133,25 +131,35 @@ python src/main.py
 
 ## 📂 Project Structure
 
-We follow a strict "Lego-like" modular architecture.
+We follow a strict modular architecture separating the Web Backend, AI Encoders, and Database logic.
 
 ```text
-Synapse/
-├── 📂 data/                 # Local weights and raw sequences
-├── 📂 src/
-│   ├── 📂 database/         # Qdrant connection logic
+Synapse-main/
+├── src/
+│   ├── Backend/             # Web Application Logic
+│   │   ├── Controllers/     # Logic handlers (e.g., DNAController.py)
+│   │   ├── Data/            # Schemas (DNAschema.py)
+│   │   ├── Routers/         # API Routes (DNARouter.py)
+│   │   ├── Template/        # HTML Frontend (index.html)
+│   │   ├── static/          # CSS & Assets
+│   │   └── App.py           # Web App Entry Point
+│   │
+│   ├── database/            # Qdrant Connection Logic
 │   │   ├── db_manager.py    # Production DB Connector
-│   │   └── mock_db.py       # Mock DB for offline dev
-│   ├── 📂 encoders/         # AI Model Wrappers
+│   │   ├── mock_db.py       # Mock DB for offline dev
+│   │   └── upload_vectors.py# Script to seed DB with vectors
+│   │
+│   ├── encoders/            # AI Model Wrappers
 │   │   ├── dna_encoder.py   # NTv2 Implementation
 │   │   ├── protein_encoder.py # ESM-2 Implementation
-│   │   └── real_encoder.py  # Production Inference Logic
-│   ├── 📂 ui/               # Streamlit / Frontend
-│   ├── 📂 utils/            # Data cleaning & k-mer generation
-│   └── main.py              # Central Orchestrator (Entry Point)
-├── docker-compose.yaml      # Infrastructure Config
+│   │   └── mock_encoder.py  # Mock Encoders for testing
+│   │
+│   ├── utils/               # Data cleaning & processing
+│   └── main.py              # Central Orchestrator / CLI Entry
+│
+├── docker-compose.yaml      # Qdrant Infrastructure
 ├── requirements.txt         # Dependencies
-└── README.md                # You are here
+└── README.md                # Documentation
 ```
 
 ---
@@ -169,8 +177,8 @@ Synapse/
     - [ ] Train Projection Layer (MSE Loss alignment)
 
 - [ ] **Phase 3: The Product**
-    - [ ] Streamlit Dashboard Visualization
-    - [ ] 3D Protein Viewer Integration (`stmol`)
+    - [ ] Web Dashboard Visualization (HTML/Templates)
+    - [ ] 3D Protein Viewer Integration
     - [ ] Deployment to Cloud
 
 ---
