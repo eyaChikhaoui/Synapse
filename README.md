@@ -176,11 +176,6 @@ Synapse-main/
     - [ ] Integrate Real `esm2_t6_8M`
     - [ ] Train Projection Layer (MSE Loss alignment)
 
-- [ ] **Phase 3: The Product**
-    - [ ] Web Dashboard Visualization (HTML/Templates)
-    - [ ] 3D Protein Viewer Integration
-    - [ ] Deployment to Cloud
-
 ---
 
 ## 👥 The Team
