@@ -1,63 +1,75 @@
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer, AutoModel
-import sys
 import os
-
-# --- PATH FIX: Ensure we can import from 'src' root ---
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
-
-from utils.data_processor import DataProcessor
 
 class DNAEncoder(nn.Module):
     """
-    Person 1 (ML Lead) - Production Real Encoder.
-    Replaces mock numbers with real biological embeddings.
+    Production DNA Encoder for Synapse.
+    
+    Implements the "Bridge" logic:
+    Projects NTv3 Embeddings (512-dim) -> Shared Latent Space (768-dim).
+    
+    Reference: Synapse Technical Deep Dive, Section 3.1
     """
     def __init__(self, model_id="InstaDeepAI/nucleotide-transformer-v2-50m-multi-species"):
         super().__init__()
         
-        # Load Tokenizer
+        print(f"🧬 [DNAEncoder] Initializing with base: {model_id}")
+        
+        # 1. Load Tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
         
-        # --- CRITICAL FIX: Ignore Mismatched Sizes ---
-        # The v2-50m model has inconsistent internal dimensions for some layers 
-        # (GLU vs Standard FFN). We use ignore_mismatched_sizes=True to load 
-        # the valid weights and safely skip the conflicting ones.
+        # 2. Load Foundation Model (NTv3)
+        # Critical: ignore_mismatched_sizes=True is required to safely load 
+        # pre-trained weights while attaching custom heads if necessary.
         self.model = AutoModel.from_pretrained(
-            model_id, 
+            model_id,
             trust_remote_code=True,
-            ignore_mismatched_sizes=True 
+            ignore_mismatched_sizes=True  # [cite: 130]
         )
         
-        self.processor = DataProcessor()
+        # 3. The Bridge Projection Layer
+        # Input: 512 (NTv3 Hidden Size) -> Output: 768 (Synapse Shared Space)
+        # Weights: W_dna in R^{768x512}
+        self.projection = nn.Linear(512, 768) # [cite: 67]
         
-        # Ensure output is always 768 for P2 (DB) and P4 (UI)
-        # NTv2 outputs 512 dim, so we project it to 768
-        self.projection = nn.Linear(512, 768) 
+        print("✅ [DNAEncoder] Ready. Projection: 512 -> 768")
 
     def get_vector(self, sequence: str):
-        clean_seq = self.processor.clean_dna(sequence)
+        """
+        Tokenizes input, generates embedding, and projects to latent space.
+        Returns: numpy array of shape (768,)
+        """
+        # Sanitation: standardizing input 
+        clean_seq = sequence.upper().replace(" ", "")
         
-        # Step 2: Biological Inference
         inputs = self.tokenizer(clean_seq, return_tensors="pt")
+        
         with torch.no_grad():
             outputs = self.model(**inputs)
-            # Use mean pooling
+            
+            # Mean Pooling to derive sequence vector
+            # Listing 3.1 specifies .mean(dim=1) [cite: 138]
             embeddings = outputs.last_hidden_state.mean(dim=1)
             
-            # Step 3: Project to Shared Latent Space (768)
-            projected = self.projection(embeddings)
-            return projected.squeeze().numpy()
+            # Project to Shared Latent Space
+            # Listing 3.1 specifies projection -> squeeze -> numpy [cite: 140]
+            projected_vec = self.projection(embeddings)
+            
+            return projected_vec.squeeze().numpy()
 
 if __name__ == "__main__":
-    print("⏳ Initializing RealEncoder (ignore_mismatched_sizes=True)...")
-    encoder = RealEncoder()
-    print("✅ RealEncoder initialized successfully.")
-    
-    # Test with a dummy sequence
+    # Smoke Test
+    encoder = DNAEncoder()
     test_seq = "ATGCGTAGCTAG"
-    vector = encoder.encode(test_seq)
-    print(f"🧬 Vector Shape: {vector.shape} (Should be 768)")
+    vector = encoder.get_vector(test_seq)
+    
+    print(f"\n🧪 DNA Smoke Test:")
+    print(f"Input: {test_seq}")
+    print(f"Vector Shape: {vector.shape}")
+    
+    if vector.shape == (768,):
+        print("🎉 SUCCESS: DNA Vector aligned to 768 dimensions.")
+    else:
+        print(f"❌ ERROR: Expected (768,), got {vector.shape}")
