@@ -4,5 +4,5 @@ class DNARequest(BaseModel):
     dna_input: str
 
 class DNAResponse(BaseModel):
-    length: int
-    result: str
+    status: str
+    results: list
