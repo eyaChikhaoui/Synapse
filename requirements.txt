@@ -1,10 +1,23 @@
-flask
-flask-cors
-numpy
-pandas
-qdrant-client
+# --- AI Core ---
 torch
 transformers
-python-dotenv
-python-multipart 
+accelerate
+numpy
+pandas
+
+# --- Backend (Inference Core) ---
+flask
+flask-cors
+
+# --- Frontend (Edge Gateway) ---
+fastapi
+uvicorn
+python-multipart
 httpx
+jinja2
+
+# --- Database & Utils ---
+qdrant-client
+python-dotenv
+requests
+huggingface_hub
