@@ -1,70 +1,61 @@
 import os
+import logging
 from typing import List, Dict, Any
 from qdrant_client import QdrantClient
 
+# Configure Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("VectorDB")
+
 class VectorDB:
     def __init__(self, host: str = "localhost", port: int = 6333):
+        self.collection_name = "synapse_v1"
+        self.client = None
+        
         try:
-            # We skip printing the version because it crashes on your machine
             self.client = QdrantClient(host=host, port=port)
-            self.collection_name = "synapse_v1"
-            
-            # Simple connection test
+            # Quick connectivity check
             self.client.get_collections()
-            print(f"✅ Connected to Qdrant at {host}:{port}")
+            logger.info(f"✅ Connected to Qdrant at {host}:{port}")
         except Exception as e:
-            print(f"⚠️ Could not connect to Qdrant: {e}")
-            self.client = None
+            logger.critical(f"⚠️ Could not connect to Qdrant: {e}")
+            logger.critical("   Ensure the Docker container is running: 'docker-compose up -d'")
 
     def search_similar(self, vector: List[float], top_k: int = 3) -> List[Dict[str, Any]]:
+        """
+        Performs Cosine Similarity search in the Shared Latent Space.
+        """
         if not self.client:
-            return [{"error": "DB not initialized"}]
+            return [{"error": "Database not initialized"}]
 
         try:
-            # Ensure vector is a list
+            # Ensure input is a standard list of floats
             if hasattr(vector, 'tolist'):
                 vector = vector.tolist()
 
-            print(f"🔍 Searching... (Dim: {len(vector)})")
+            logger.info(f"🔍 Executing Query (Vector Dim: {len(vector)})...")
             
-            # --- ATTEMPT 1: Standard Search ---
-            if hasattr(self.client, 'search'):
-                search_result = self.client.search(
-                    collection_name=self.collection_name,
-                    query_vector=vector,
-                    limit=top_k
-                )
-            else:
-                # --- ATTEMPT 2: Fallback (Older versions or Sync/Async mixup) ---
-                print("⚠️ '.search()' not found. Trying '.query_points()'...")
-                search_result = self.client.query_points(
-                    collection_name=self.collection_name,
-                    query=vector,
-                    limit=top_k
-                ).points
+            search_result = self.client.search(
+                collection_name=self.collection_name,
+                query_vector=vector,
+                limit=top_k
+            )
 
-            # Process Results
+            # Process Results into clean JSON
             results = []
             for hit in search_result:
-                # Handle difference between object types
-                payload = getattr(hit, 'payload', {})
-                score = getattr(hit, 'score', 0.0)
-                doc_id = getattr(hit, 'id', 'unknown')
-                
                 results.append({
-                    "id": doc_id,
-                    "score": score,
-                    "metadata": payload 
+                    "id": getattr(hit, 'id', 'unknown'),
+                    "score": getattr(hit, 'score', 0.0),
+                    "metadata": getattr(hit, 'payload', {}) 
                 })
             
-            print(f"✅ Found {len(results)} matches.")
+            logger.info(f"✅ Found {len(results)} matches.")
             return results
             
         except Exception as e:
-            print(f"❌ Database Error: {e}")
-            # DEBUGGING: Print what IS available
-            print(f"ℹ️ Client methods available: {[m for m in dir(self.client) if not m.startswith('_')]}")
-            return []
+            logger.error(f"❌ Search Failed: {e}")
+            return [{"error": f"Search execution failed: {str(e)}"}]
 
 if __name__ == "__main__":
     db = VectorDB()
