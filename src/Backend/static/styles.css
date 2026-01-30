@@ -1,0 +1,135 @@
+/* --- SYNAPSE GLOBAL STYLES --- */
+:root {
+    --bg-deep: #0a061a;        /* Darker midnight for background */
+    --card-bg: #1a1433;        /* Subtle purple for containers */
+    --primary-purple: #311B92;
+    --accent-red: #D32F2F;
+    --vibrant-coral: #FF5252;
+    --text-white: #ffffff;
+    --text-dim: #b0aec4;
+}
+
+/* Base resets handled by Tailwind, but we enforce overrides here */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* --- CUSTOM UTILITIES --- */
+
+#molecule-viewer canvas {
+    outline: none; 
+    border-radius: 0.5rem;
+}
+
+textarea::-webkit-scrollbar {
+    width: 8px;
+}
+textarea::-webkit-scrollbar-track {
+    background: #f1f5f9; 
+}
+textarea::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 4px;
+}
+textarea::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* HTMX Loading Indicator logic */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+    pointer-events: none; 
+}
+.htmx-request .htmx-indicator {
+    opacity: 1;
+    pointer-events: all;
+}
+.htmx-request.htmx-indicator {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* --- LEGACY COMPATIBILITY --- */
+.glow-button-legacy {
+    background: linear-gradient(135deg, var(--primary-purple) 0%, var(--accent-red) 100%);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.glow-button-legacy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(211, 47, 47, 0.4);
+}
+
+/* --- 📄 SOTA PDF REPORT PROTOCOL (The Hackathon Winner) --- */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 20mm;
+    }
+
+    /* 1. Hide everything unnecessary for a professional lab report */
+    nav, footer, form, #tab-search, #tab-compare, .flex.border-b, button {
+        display: none !important;
+    }
+
+    /* 2. Reset Backgrounds for Ink Saving & Clarity */
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    /* 3. Layout Control: Make results full width */
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .lg\:col-span-5, .lg\:col-span-7 {
+        width: 100% !important;
+        display: block !important;
+    }
+
+    /* 4. Content Protection: No breaking molecular structures across pages */
+    .bg-white.rounded-xl, #molecule-viewer, #plotly-chart {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        border: 1px solid #e2e8f0 !important;
+        margin-bottom: 20px !important;
+        box-shadow: none !important;
+    }
+
+    /* Ensure 3D and 2D charts are visible */
+    #molecule-viewer, #plotly-chart {
+        height: 350px !important;
+        min-height: 350px !important;
+    }
+
+    /* 5. Add a "Report Header" visible only in print */
+    body::before {
+        content: "🧬 SYNAPSE: GENOMIC INTELLIGENCE REPORT";
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 30px;
+        color: #1a061a;
+        border-bottom: 2px solid #311B92;
+        padding-bottom: 10px;
+    }
+}

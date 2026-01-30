@@ -1,0 +1,202 @@
+/* File: src/Backend/static/report_styles.css */
+
+/* 1. SCREEN RULES: Hide the report buffer while browsing */
+@media screen {
+    #report-buffer {
+        display: none !important;
+    }
+}
+
+/* 2. PRINT RULES: The Magic Transformation */
+@media print {
+    /* --- GLOBAL RESET: HIDE THE APP --- */
+    /* We hide 'main' specifically to remove the "Visible View Window" entirely */
+    nav, footer, form, main, .htmx-indicator, 
+    #tab-search, #tab-compare, #tab-batch, 
+    button, .toast-notification {
+        display: none !important;
+    }
+
+    /* --- SETUP: A4 Page Standard --- */
+    @page {
+        size: A4 portrait;
+        margin: 20mm;
+        /* Browser default headers/footers can be turned off in print dialog */
+    }
+
+    body {
+        background: white !important;
+        color: #0f172a !important; /* Slate-900 for sharp text */
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 11pt; /* Optimal for A4 reading */
+        line-height: 1.5;
+        counter-reset: reportPage; /* Initialize Page Counter */
+    }
+
+    /* --- REVEAL: Show ONLY the Report Buffer --- */
+    #report-buffer {
+        display: block !important;
+        width: 100% !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    /* --- COMPONENT STYLES --- */
+
+    /* The Page Container */
+    .report-page {
+        position: relative;
+        min-height: 250mm; /* Force full A4 height */
+        page-break-after: always;
+        padding-bottom: 50px; /* Space for footer */
+        counter-increment: reportPage; /* Count this page */
+    }
+
+    /* Page Numbering Footer */
+    .page-footer {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 9pt;
+        color: #94a3b8;
+        border-top: 1px solid #e2e8f0;
+        width: 100%;
+        text-align: right;
+        padding-top: 10px;
+    }
+    .page-footer::after {
+        content: "Page " counter(reportPage);
+    }
+
+    /* Avoid breaking charts in half */
+    .break-inside-avoid {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* --- COVER PAGE STYLES --- */
+    .report-cover {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 260mm; /* Slightly less than A4 to fit margins */
+    }
+
+    .cover-logo-placeholder {
+        width: 120px;
+        height: 120px;
+        background-color: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+    /* If you put a real <img> inside, this handles it */
+    .cover-logo-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+    }
+
+    .cover-title {
+        font-size: 32pt;
+        font-weight: 800;
+        color: #311B92; /* Synapse Purple */
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+    
+    .cover-subtitle {
+        font-size: 14pt;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 60px;
+        letter-spacing: 0.05em;
+    }
+
+    .cover-meta {
+        text-align: left;
+        width: 100%;
+        max-width: 400px;
+        border-top: 2px solid #311B92;
+        padding-top: 20px;
+    }
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 10pt;
+    }
+    .meta-label { font-weight: bold; color: #475569; }
+    .meta-value { color: #1e293b; font-family: 'JetBrains Mono', monospace; }
+
+    /* --- TABLE OF CONTENTS --- */
+    .toc-header {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #0f172a;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }
+
+    .toc-entry {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 12px;
+    }
+
+    .toc-chapter-name {
+        font-weight: 600;
+        color: #334155;
+        flex-grow: 1; /* Takes up space */
+    }
+    
+    .toc-dots {
+        flex-grow: 10; /* Stretches to fill gap */
+        border-bottom: 1px dotted #cbd5e1;
+        margin: 0 10px;
+    }
+
+    .toc-page-ref {
+        font-family: 'JetBrains Mono', monospace;
+        color: #64748b;
+    }
+
+    /* --- CHAPTER CONTENT --- */
+    .chapter-header {
+        background-color: #f8fafc;
+        border-left: 6px solid #311B92;
+        padding: 20px;
+        margin-bottom: 30px;
+        margin-top: 0; /* Reset */
+    }
+    .chapter-id {
+        font-size: 9pt;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #64748b;
+        margin-bottom: 5px;
+    }
+    .chapter-name {
+        font-size: 20pt;
+        font-weight: bold;
+        color: #1e293b;
+    }
+
+    /* Clean up Visualization Images for Print */
+    .report-viz-container {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px;
+        background: white;
+        margin-bottom: 20px;
+    }
+}
