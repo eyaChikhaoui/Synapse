@@ -1,11 +1,6 @@
 # 🧬 SYNAPSE
-### Multimodal Biological Intelligence: Bridging the Gap Between DNA and Proteins
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=github)
-![Python Version](https://img.shields.io/badge/python-3.9%2B-blue?style=for-the-badge&logo=python)
-![Docker](https://img.shields.io/badge/docker-containerized-2496ED?style=for-the-badge&logo=docker)
-![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)
-![Hackathon](https://img.shields.io/badge/Hackathon-Tunisia-purple?style=for-the-badge)
+### Multimodal Biological Intelligence: Bridging the Gap Between DNA and Proteins
 
 > **"DNA is fast, but understanding is slow."**
 > Synapse eliminates the translation loss between Genomics and Proteomics by unifying them into a **Shared Latent Space**, turning heavy protein folding simulations into instant geometric search problems.
@@ -13,74 +8,118 @@
 ---
 
 ## 📚 Table of Contents
-- [🧐 The Problem](#-the-problem)
-- [💡 The Solution](#-the-solution)
-- [🏗️ Architecture](#-architecture)
-- [⚡ Quick Start](#-quick-start)
-- [🧪 Usage (Mock vs Real)](#-usage-mock-vs-real)
-- [📂 Project Structure](#-project-structure)
-- [🛣️ Roadmap](#-roadmap)
-- [👥 The Team](#-the-team)
+
+* [🧐 The Problem](https://www.google.com/search?q=%23-the-problem)
+* [💡 The Solution](https://www.google.com/search?q=%23-the-solution)
+* [🏗️ Architecture](https://www.google.com/search?q=%23-architecture)
+* [⚡ Quick Start](https://www.google.com/search?q=%23-quick-start)
+* [🔥 Key Features](https://www.google.com/search?q=%23-key-features)
+* [📂 Project Structure](https://www.google.com/search?q=%23-project-structure)
+* [🛣️ Roadmap](https://www.google.com/search?q=%23-roadmap)
+* [👥 The Team](https://www.google.com/search?q=%23-the-team)
 
 ---
 
 ## 🧐 The Problem
+
 Modern biological research faces a critical **"Interpretation Gap"**.
-1.  **The VUS Crisis:** We find "typos" (mutations) in DNA daily, but determining if they are dangerous requires weeks of expert analysis.
-2.  **The Computational Wall:** Tools like AlphaFold are revolutionary but computationally massive. "Folding" a protein to check a single mutation is too slow for critical care.
-3.  **Siloed Intelligence:** DNA models (Nucleotide Transformer) and Protein models (ESM) speak different languages, leading to information loss during translation.
+
+1. **The VUS Crisis:** We find "typos" (mutations) in DNA daily, but determining if they are dangerous requires weeks of expert analysis.
+2. **The Computational Wall:** Tools like AlphaFold are revolutionary but computationally massive. "Folding" a protein to check a single mutation is too slow for critical care.
+3. **Siloed Intelligence:** DNA models (Nucleotide Transformer) and Protein models (ESM) speak different languages, leading to information loss during translation.
 
 ## 💡 The Solution
+
 **Synapse** acts as an intelligent "Adapter Layer". Instead of translating text, we project biological data into a **Shared Latent Space (768 dimensions)**.
 
-* **Multimodal Embeddings:** We use **NTv3** (DNA) and **ESM-2** (Protein) to create high-dimensional vectors.
-* **Mathematical Alignment:** A projection layer maps these vectors so that a DNA sequence and its resulting Protein structure land in the same spot on the map.
-* **Geometry over Tables:** We use **Qdrant** to store these vectors, allowing us to find biological matches via "Nearest Neighbor" search in milliseconds.
+* 
+**Multimodal Embeddings:** We use **NTv3** (DNA) and **ESM-2** (Protein) to create high-dimensional vectors.
+
+
+* 
+**Mathematical Alignment:** A custom **Projection Head** (Linear -> LayerNorm -> GELU) maps these vectors so that a DNA sequence and its resulting Protein structure land in the same spot on the map.
+
+
+* 
+**Geometry over Tables:** We use **Qdrant** to store these vectors, allowing us to find biological matches via "Nearest Neighbor" search in milliseconds.
+
+
 
 ---
 
 ## 🏗️ Architecture
 
+The system follows a **Service-Oriented Architecture** separating the heavy inference core from the user-facing gateway.
+
 ```mermaid
 graph LR
-    A[Raw DNA Sequence] -->|Clean & Tokenize| B(DNA Encoder NTv2)
-    C[Protein Structure] -->|Sequence Extraction| D(Protein Encoder ESM-2)
+    User[User / Frontend] -->|HTTP Request| Gateway(FastAPI Gateway :8000)
     
-    B -->|Projection Layer| E{Shared Latent Space<br/>768 Dimensions}
-    D -->|Projection Layer| E
+    Gateway -->|Forward Request| Core(Inference Core :5000)
     
-    E -->|Upsert Vectors| F[(Qdrant Vector DB)]
+    subgraph "Inference Core (Flask)"
+        Core -->|DNA Input| NTv3(NTv3 Encoder)
+        Core -->|Protein Input| ESM(ESM-2 Encoder)
+        NTv3 -->|Project| Latent{Shared Latent Space<br/>768 Dims}
+        ESM -->|Project| Latent
+    end
     
-    User[User Query] -->|Input Sequence| B
-    B -->|Vector Search| F
-    F -->|Nearest Neighbors| Result[Identified Phenotype]
+    Latent -->|Cosine Search| DB[(Qdrant Vector DB)]
+    DB -->|Nearest Neighbors| Core
+    Core -->|Results JSON| Gateway
+    Gateway -->|Render UI| User
+
 ```
 
 ### 🛠️ Tech Stack
-* **Core Engine:** Python 3.9+
-* **Backend Framework:** Flask / Python
-* **Genomics Model:** `InstaDeepAI/nucleotide-transformer-v2-50m-multi-species`
-* **Proteomics Model:** `facebook/esm2_t6_8M_UR50D`
-* **Vector Database:** Qdrant (Dockerized)
-* **Orchestration:** Custom `SynapseOrchestrator`
+
+* 
+**Edge Gateway:** FastAPI (Python) + Jinja2 Templates + HTMX 
+
+
+* 
+**Inference Core:** Flask (Python) + PyTorch 
+
+
+* 
+**Genomics Model:** `InstaDeepAI/nucleotide-transformer-v3` 
+
+
+* 
+**Proteomics Model:** `facebook/esm2_t33_650M_UR50D` 
+
+
+* 
+**Vector Database:** Qdrant (Dockerized) 
+
+
+* 
+**Visualization:** Plotly.js (2D Latent Map) + 3Dmol.js (Protein Structures) 
+
+
 
 ---
 
 ## ⚡ Quick Start
 
 ### Prerequisites
+
 * [Docker Desktop](https://www.docker.com/) (Required for Qdrant)
 * Python 3.9+
 * Git
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/eyaChikhaoui/Synapse.git
 cd Synapse-main
+
 ```
 
 ### 2. Set Up Environment
+
 It is recommended to use a virtual environment.
+
 ```bash
 python -m venv venv
 # Windows:
@@ -89,102 +128,185 @@ venv\Scripts\activate
 source venv/bin/activate
 
 pip install -r requirements.txt
+
 ```
 
 ### 3. Launch Infrastructure (Qdrant)
+
 Start the vector database container in the background.
+
 ```bash
 docker-compose up -d
+
 ```
-*Verify Qdrant is running at `http://localhost:6333/dashboard`*
+
+*Verify Qdrant is running at `http://localhost:6333/dashboard*` 
+
+### 4. Run the System
+
+You need to run two services in separate terminals:
+
+**Terminal A (Inference Core):**
+
+```bash
+python src/main.py
+# Runs on localhost:5000
+
+```
+
+
+
+**Terminal B (Edge Gateway):**
+
+```bash
+python src/Backend/App.py
+# Runs on localhost:8000
+
+```
+
+
+*Access the UI at `http://localhost:8000*`
 
 ---
 
-## 🧪 Usage (Mock vs Real)
+## 🔥 Key Features
 
-Synapse is designed for rapid iteration. We support two execution modes to unblock development.
+### 1. Zero-Shot Variant Scoring (The "Deal Breaker")
 
-### Mode A: The "Mock" Protocol (Fast Dev)
-*Use this when developing the UI or Database logic without loading heavy AI models.*
-1.  Open `src/main.py`.
-2.  Uncomment `MockVectorDB` / `MockEncoder` and comment out the real versions.
-3.  Run the pipeline:
-```bash
-python src/main.py
-```
-*Result: Instant response with dummy data.*
+Instantly assess the impact of a genetic mutation without expensive simulations.
 
-### Mode B: The "Real" Pipeline (Production)
-*Full AI inference using Nucleotide Transformer and ESM-2.*
-1.  Ensure `src/main.py` is importing `DNAEncoder` and `VectorDB`.
-2.  Initialize the database with vectors (if first run):
-```bash
-python src/database/upload_vectors.py
-```
-3.  Run the Application:
-```bash
-python src/main.py
-```
-*Result: Real biological inference and cosine similarity search.*
+* 
+**How:** Calculates the cosine distance between the "Wild Type" (normal) and "Mutant" vectors.
+
+
+* **Output:** A similarity score (0-100%). Low similarity = High Pathogenicity.
+
+
+
+### 2. RL-Ready Reward API
+
+A machine-readable endpoint designed for Reinforcement Learning agents.
+
+* **Use Case:** Can be used as a "fitness function" for Generative AI models designing new proteins.
+* 
+**Endpoint:** `POST /api/reward` -> Returns scalar float.
+
+
+
+### 3. Batch Processing
+
+High-throughput analysis pipeline.
+
+* 
+**Capacity:** Process 1000+ sequences via text input or file upload (JSON/CSV/PDF).
+
+
+* 
+**Performance:** Utilizes Qdrant's batch search for sub-second retrieval.
+
+
+
+### 4. Lab Report Generation
+
+One-click PDF generation for documenting findings.
+
+* 
+**Includes:** 3D structure snapshots, latent space charts, and variant impact assessment.
+
+
 
 ---
 
 ## 📂 Project Structure
 
-We follow a strict modular architecture separating the Web Backend, AI Encoders, and Database logic.
-
 ```text
 Synapse-main/
 ├── src/
-│   ├── Backend/             # Web Application Logic
-│   │   ├── Controllers/     # Logic handlers (e.g., DNAController.py)
-│   │   ├── Data/            # Schemas (DNAschema.py)
-│   │   ├── Routers/         # API Routes (DNARouter.py)
-│   │   ├── Template/        # HTML Frontend (index.html)
-│   │   ├── static/          # CSS & Assets
-│   │   └── App.py           # Web App Entry Point
+│   ├── Backend/             # FastAPI Gateway (Port 8000)
+│   │   ├── Controllers/     # UI Logic & PDF Generation
+│   │   ├── Routers/         # API Routes
+│   │   ├── Template/        # HTML/Jinja2 Frontend
+│   │   ├── static/          # CSS, JS, & Assets
+│   │   └── App.py           # Gateway Entry Point
 │   │
-│   ├── database/            # Qdrant Connection Logic
-│   │   ├── db_manager.py    # Production DB Connector
-│   │   ├── mock_db.py       # Mock DB for offline dev
-│   │   └── upload_vectors.py# Script to seed DB with vectors
+│   ├── database/            # Data Layer
+│   │   ├── db_manager.py    # Qdrant Connector
+│   │   ├── loader.py        # SOTA Parquet Loader
+│   │   └── *_pipeline.py    # Offline Embedding Generators
 │   │
 │   ├── encoders/            # AI Model Wrappers
-│   │   ├── dna_encoder.py   # NTv2 Implementation
-│   │   ├── protein_encoder.py # ESM-2 Implementation
-│   │   └── mock_encoder.py  # Mock Encoders for testing
+│   │   ├── dna_encoder.py   # NTv3 + Projection Head
+│   │   └── protein_encoder.py # ESM-2 + Projection Head
 │   │
-│   ├── utils/               # Data cleaning & processing
-│   └── main.py              # Central Orchestrator / CLI Entry
+│   ├── models/              # Neural Network Weights
+│   │   ├── synapse_sota.py  # Projection Head Architecture
+│   │   └── *.pth            # Trained Weights
+│   │
+│   └── main.py              # Flask Inference Core (Port 5000)
 │
 ├── docker-compose.yaml      # Qdrant Infrastructure
 ├── requirements.txt         # Dependencies
 └── README.md                # Documentation
+
 ```
+
+
 
 ---
 
 ## 🛣️ Roadmap
 
-- [x] **Phase 1: Foundation**
-    - [x] Dockerized Qdrant Setup
-    - [x] Mock Encoders & Database for Rapid UI Dev
-    - [x] Shared Latent Space Definition (768-dim)
+* [x] **Phase 1: Foundation**
+* [x] Dockerized Qdrant Setup 
 
-- [ ] **Phase 2: The Bridge**
-    - [ ] Integrate Real `nucleotide-transformer-v2`
-    - [ ] Integrate Real `esm2_t6_8M`
-    - [ ] Train Projection Layer (MSE Loss alignment)
+
+* [x] Shared Latent Space Definition (768-dim) 
+
+
+* [x] Dual-Service Architecture (FastAPI + Flask) 
+
+
+
+
+* [x] **Phase 2: The Bridge (SOTA)**
+* [x] Integrate `nucleotide-transformer-v3` 
+
+
+* [x] Integrate `esm2_t33_650M_UR50D` 
+
+
+* [x] Implement Custom Projection Heads (Linear -> GELU -> Norm) 
+
+
+
+
+* [x] **Phase 3: Production Features**
+* [x] Zero-Shot Variant Scoring API 
+
+
+* [x] Batch Processing (Text & File) 
+
+
+* [x] PDF Report Generation 
+
+
+* [x] 3D Protein Visualization (PDB) 
+
+
+
+
 
 ---
 
 ## 👥 The Team
 
-**Team wasa3 methniya**
-* **Eya Chikhaoui**
-* **Balkis Mahjoubi**
-* **Aziz Mazghouni**
-* **Mouhamed Gharsallah**
+**Team Wasa3 Methniya**
+
+* **Eya Chikhaoui** - AI Research & Backend Lead
+* **Balkis Mahjoubi** - Product Strategy & Data
+* **Aziz Mazghouni** - Frontend Engineering & Viz
+* **Mouhamed Gharsallah** - DevOps & Infrastructure
 
 ---
+
 *Built with 💻 and 🧬 in Tunisia.*
