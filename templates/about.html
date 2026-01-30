@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Synapse</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="bg-gray-50 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Navbar (Reuse) -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="{{ url_for('home') }}" class="flex items-center gap-3 group">
+                <img src="{{ url_for('static', filename='synapse-logo.png') }}" 
+                     alt="Synapse Logo" 
+                     class="h-10 w-auto object-contain">
+                <span class="text-xl font-bold tracking-tight text-slate-900">SYNAPSE</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                <a href="{{ url_for('home') }}" class="hover:text-blue-600 transition-colors">Home</a>
+                <a href="{{ url_for('about') }}" class="text-blue-600">About Us</a>
+                <a href="{{ url_for('services') }}" class="hover:text-blue-600 transition-colors">Services</a>
+                <a href="{{ url_for('contact') }}" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="flex-grow py-12 px-6">
+        <div class="max-w-4xl mx-auto text-center mb-12">
+            <h1 class="text-3xl font-bold text-slate-900 mb-4">The Minds Behind Synapse</h1>
+            <p class="text-gray-600">
+                Team <strong>wasa3 methniya</strong> combining Biological Sciences and Artificial Intelligence.
+            </p>
+        </div>
+
+        <!-- Team Grid -->
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Member 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl">
+                    <i class="fa-solid fa-dna"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-slate-900">Eya Chikhaoui</h3>
+                    <p class="text-sm text-gray-500">Bioinformatics & Research Lead</p>
+                </div>
+            </div>
+
+            <!-- Member 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl">
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-slate-900">Mouhamed Gharsallah</h3>
+                    <p class="text-sm text-gray-500">Backend & Infrastructure</p>
+                </div>
+            </div>
+            
+            <!-- Member 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-slate-900">Balkis Mahjoubi</h3>
+                    <p class="text-sm text-gray-500">AI Model Architect</p>
+                </div>
+            </div>
+
+            <!-- Member 4 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-xl">
+                    <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-slate-900">Aziz Mazghouni</h3>
+                    <p class="text-sm text-gray-500">Frontend & Visualization</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-white py-6 text-center text-xs text-slate-500">
+        &copy; <span id="year"></span> Synapse Project.
+    </footer>
+    <script>document.getElementById('year').innerText = new Date().getFullYear();</script>
+</body>
+</html>

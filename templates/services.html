@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services | Synapse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="bg-gray-50 text-slate-800 flex flex-col min-h-screen">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="{{ url_for('home') }}" class="flex items-center gap-3 group">
+                <img src="{{ url_for('static', filename='synapse-logo.png') }}" alt="Synapse Logo" class="h-10 w-auto object-contain">
+                <span class="text-xl font-bold tracking-tight text-slate-900">SYNAPSE</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                <a href="{{ url_for('home') }}" class="hover:text-blue-600 transition-colors">Home</a>
+                <a href="{{ url_for('about') }}" class="hover:text-blue-600 transition-colors">About Us</a>
+                <a href="{{ url_for('services') }}" class="text-blue-600">Services</a>
+                <a href="{{ url_for('contact') }}" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-slate-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Computational Biology Services</h1>
+            <p class="text-slate-400 max-w-2xl mx-auto">Accelerating genomic discovery through advanced AI models.</p>
+        </div>
+    </header>
+
+    <main class="flex-grow py-16 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
+                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-xl mb-6">
+                    <i class="fa-solid fa-dna"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-3">Genomic Alignment</h3>
+                <p class="text-sm text-slate-600">High-speed FASTA sequence processing and vector alignment.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
+                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 text-xl mb-6">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-3">Structure Prediction</h3>
+                <p class="text-sm text-slate-600">Real-time 3D protein folding visualization using inference models.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
+                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center text-green-600 text-xl mb-6">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-3">Variant Classification</h3>
+                <p class="text-sm text-slate-600">AI-driven clinical significance scoring for variant analysis.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-white py-6 text-center text-xs text-slate-500">
+        &copy; <span id="year"></span> Synapse Project.
+    </footer>
+    <script>document.getElementById('year').innerText = new Date().getFullYear();</script>
+</body>
+</html>
