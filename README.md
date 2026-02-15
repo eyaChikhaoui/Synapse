@@ -70,7 +70,7 @@ graph LR
     Gateway -->|Render UI| User
 
 ```
-![Screenshot](src\assets\how-it-works.png)
+![Screenshot](src/assets/how-it-works.png)
 
 
 
@@ -302,7 +302,7 @@ Synapse-main/
 ---
 
 ## 👥 Team
-![Screenshot](src\assets\team.png)
+![Screenshot](src/assets/team.png)
 
 * **Eya Chikhaoui** - Team Leader - AI Research & Backend Lead
 * **Balkis Mahjoubi** - Product Strategy & Data
