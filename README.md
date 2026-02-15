@@ -70,6 +70,9 @@ graph LR
     Gateway -->|Render UI| User
 
 ```
+![Screenshot](src\assets\how-it-works.png)
+
+
 
 ### 🛠️ Tech Stack
 
@@ -298,11 +301,10 @@ Synapse-main/
 
 ---
 
-## 👥 The Team
+## 👥 Team
+![Screenshot](src\assets\team.png)
 
-**Team Wasa3 Methniya**
-
-* **Eya Chikhaoui** - AI Research & Backend Lead
+* **Eya Chikhaoui** - Team Leader - AI Research & Backend Lead
 * **Balkis Mahjoubi** - Product Strategy & Data
 * **Aziz Mazghouni** - Frontend Engineering & Viz
 * **Mouhamed Gharsallah** - DevOps & Infrastructure

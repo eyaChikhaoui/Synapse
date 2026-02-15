@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 import time
 
-# --- CONFIGURATION ---
+# --- CONFIGURATION ----
 BASE_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_FILE = BASE_DIR / "Backend" / "Data" / "proteins.json"
 

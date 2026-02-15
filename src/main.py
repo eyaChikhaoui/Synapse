@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("SynapseCore")
 
-# --- PRODUCTION IMPORTS ---
+# --- PRODUCTION IMPORTS ----
 # We force these. If they fail, the app should crash (Fail Fast).
 try:
     from encoders.dna_encoder import DNAEncoder
